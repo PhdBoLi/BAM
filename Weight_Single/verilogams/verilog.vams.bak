@@ -1,0 +1,22 @@
+//Verilog-AMS HDL for "BAM_V1", "Weight_Single" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Weight_Single (P, N,);
+inout P,N;
+electrical P,N;
+real  w0;
+//randseed=1;
+//randnum=abs($random(randseed)%10);
+MR 
+//          #(
+//		   .Wo	    ()
+//		   )
+           M1(
+			.P		(P),
+			.N		(n)
+			);
+
+
+endmodule

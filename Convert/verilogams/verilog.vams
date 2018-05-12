@@ -1,0 +1,20 @@
+//Verilog-AMS HDL for "BAM_V1", "Convert" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Convert (In,P1N0,P0N1);
+input In;
+output P1N0,P0N1;
+electrical In,P1N0,P0N1;
+real smp;
+
+analog begin
+  if (V(In) > 0.000001) 
+    begin V(P1N0)<+1;V(P0N1)<+0; end
+  else if (V(In) <-0.000001)
+    begin V(P1N0)<+0;V(P0N1)<+1; end
+  else
+ 	begin V(P1N0)<+0;V(P0N1)<+0; end
+end
+endmodule

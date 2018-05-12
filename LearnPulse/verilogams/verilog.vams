@@ -1,0 +1,20 @@
+//Verilog-AMS HDL for "BAM_V1", "LearnPulse" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+`define C 1
+module LearnPulse (X,Y,Enx,Eny,Clk,LearnPulse);
+input X,Y,Enx,Eny,Clk;
+output LearnPulse;
+electrical X,Y,Enx,Eny,Clk,LearnPulse;
+analog begin
+
+ if((V(Clk)>0.1) && (V(Enx)>0.1))
+      V(LearnPulse)<+`C*V(X)*V(Y);
+ else if ((V(Clk)<-0.1)&&(V(Eny)>0.1)) 
+        V(LearnPulse)<+`C*V(X)*V(Y);
+ else  V(LearnPulse)<+0;
+
+end
+
+endmodule

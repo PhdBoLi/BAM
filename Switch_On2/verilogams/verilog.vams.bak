@@ -1,0 +1,60 @@
+//Verilog-AMS HDL for "BAM_V1", "Switch_On2" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Switch_On2 (En,In_p,In_gnd,Outp,Outn);
+inout En,In_p,In_gnd,Outp,Outn;
+electrical In_p,In_gnd,En,Outp,Outn;
+parameter real ron=1p  from [0:inf);
+parameter real goff=1p  from [0:1/(ron+1));
+branch (In_p,out1)path1;
+branch (In_gnd,Outn)path2;
+branch (En,out1)path3;
+branch (En,Outn)path4; 
+branch (In_p,Outn)path5;
+branch (In_gnd,out1)path6; 
+branch (En,In_p)path7;
+branch (En,In_gnd)path8;
+branch (In_p,In_gnd)path9;
+branch (out1,Outn)path10;
+analog begin
+  
+  if (V(En)>=0.2) begin 
+      V(path1)<+ron*I(path1);
+      V(path2)<+ron*I(path2);
+ //     I(path3)<+goff*V(path3);
+ //     I(path4)<+goff*V(path4);
+ //     I(path5)<+goff*V(path5);
+ //     I(path6)<+goff*V(path6);
+ //     I(path7)<+goff*V(path7);
+ //     I(path8)<+goff*V(path8);
+ //     I(path9)<+goff*V(path9);
+ //     I(path10)<+goff*V(path10);
+      end
+  else if(V(En)<=-0.2) begin 
+      V(path1)<+ron*I(path1);
+      V(path2)<+ron*I(path2);
+  //    I(path3)<+goff*V(path3);
+  //    I(path4)<+goff*V(path4);
+  //    I(path5)<+goff*V(path5);
+  //    I(path6)<+goff*V(path6);
+  //    I(path7)<+goff*V(path7);
+ //     I(path8)<+goff*V(path8);
+//      I(path9)<+goff*V(path9);
+//      I(path10)<+goff*V(path10);
+      end
+  else begin 
+      I(path1)<+goff*V(path1);
+      I(path2)<+goff*V(path2);
+ //     I(path3)<+goff*V(path3);
+ //     I(path4)<+goff*V(path4);
+ //     I(path5)<+goff*V(path5);
+ //     I(path6)<+goff*V(path6);
+ //     I(path7)<+goff*V(path7);
+ //     I(path8)<+goff*V(path8);
+//      I(path9)<+goff*V(path9);
+ //     I(path10)<+goff*V(path10);
+      end
+end 
+endmodule

@@ -1,0 +1,36 @@
+//Verilog-AMS HDL for "BAM_V1", "Switch_Off" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Switch_Off (En,IO_XY,IO_P );
+inout En;
+inout IO_XY,IO_P;
+electrical IO_XY,IO_P,En;
+parameter real ron=1p  from [0:inf);
+parameter real goff=1p  from [0:1/(ron+1));
+branch (IO_XY,IO_P)path1;
+branch (IO_XY,En)path2;
+branch (IO_P,En)path3;
+
+analog begin
+  
+  if (V(En)>=0.2) begin
+      I(path1)<+goff*V(path1);
+//    I(path2)<+goff*V(path2);
+//    I(path3)<+goff*V(path3);
+      end
+  else if(V(En)<=-0.2) begin 
+      I(path1)<+goff*V(path1);
+//    I(path2)<+goff*V(path2);
+//    I(path3)<+goff*V(path3);
+      end
+  else begin 
+      V(path1)<+ron*I(path1);
+//    I(path2)<+goff*V(path2);
+//    I(path3)<+goff*V(path3);
+      end
+
+end 
+
+endmodule

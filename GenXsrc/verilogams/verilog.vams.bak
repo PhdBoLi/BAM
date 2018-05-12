@@ -1,0 +1,92 @@
+//Verilog-AMS HDL for "BAM_V1", "GenXsrc" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+`define  XBITs  96
+`define  TrainSet   3 
+`define  LoopNum   568
+`define stoptime 100
+module GenXsrc (X);
+output [`XBITs:1]X;
+reg [`XBITs:1]X;
+reg [`XBITs:1] mem  [`TrainSet-1:0];
+
+integer i,j,td;
+// reg   [7:0]  mem[256:1]  a 8-bit, 256-word  mem  
+  
+ initial begin 
+ $readmemb ( "/home/ic/Project/re_input.txt",mem); // .dat  mem
+
+
+ for(j=0;j<`LoopNum;j=j+1) 
+	begin
+    for(i=0; i<`TrainSet; i=i+1) 
+		begin
+		X = mem[i];
+		#2000;   
+  		end
+ 	end
+/*
+$readmemb ( "/home/ic/Project/input_noise_2.txt",nen); // .dat  mem
+ for(j=0;j<`TestLoop;j=j+1) 
+	begin
+ 	for(i=0; i<`TrainSet; i=i+1) 
+		begin
+     	Y = nen[i];
+	 	#200;    
+  		end
+ 	end
+
+
+ for(j=0;j<`TestLoop;j=j+1)
+	begin
+    for(i=0; i<`TrainSet; i=i+1)
+	    begin
+        Y = mem[i];
+		#200  ;
+    		end
+ 	end
+ $readmemb ( "/home/ic/Project/input_noise.txt",nen); // .dat  mem
+ for(j=0;j<`TestLoop;j=j+1)
+	 begin
+ 	 for(i=0; i<`TrainSet; i=i+1) 
+		begin
+     	Y = nen[i];
+	 	#200;   
+  		end
+	 end
+
+
+
+$readmemb ( "/home/ic/Project/input_noise_3.txt",nen); // .dat  mem
+ for(j=0;j<`TestLoop;j=j+1)
+	begin
+  	for(i=0; i<`TrainSet; i=i+1)
+		begin
+     	Y = nen[i];
+		#200; 
+  		end
+ 	end
+
+
+ for(j=0;j<1000;j=j+1)
+	begin
+  	for(i=0; i<`TrainSet; i=i+1)
+		begin 
+	 	#200;   
+  		end
+ 	end
+*/
+ for(j=0;j<1000;j=j+1) 
+	begin
+    for(i=0; i<`TrainSet; i=i+1) 	
+		begin
+		#10000;  
+    		end
+ 	end
+
+ #`stoptime $finish;
+
+ end
+ 
+endmodule

@@ -1,0 +1,11 @@
+--pcdbVlog file, Rev:1.0
+
+#CELL
+* Switch *
+I_dir_choice
+I_mode_choice
+
+#CELL
+* AMS_CCVS *
+I_ccvs
+

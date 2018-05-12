@@ -1,0 +1,23 @@
+//Verilog-AMS HDL for "BAM_V1", "Switch" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Switch (En,IO,P1O0,P0O1);
+input En,IO;
+output P1O0,P0O1;
+
+electrical En,IO,P1O0,P0O1;
+branch (IO,P1O0)path1;
+branch (IO,P0O1)path2;
+parameter real ron=1p  from [0:inf);
+parameter real goff=1p  from [0:1/(ron+1));
+analog begin
+ if(V(En)>0.2) begin V(path1)<+ron*I(path1); I(path2)<+goff*V(path2); end
+//path1 is switched on and path2 is switched off
+ else if (V(En)<-0.2) begin V(path2)<+ron*I(path2); I(path1)<+goff*V(path1); end 
+//path2 is switched on and path1 is switched off
+ else begin I(path1)<+goff*V(path1);I(path2)<+goff*V(path2); end
+//path1,path2  is switched off
+end
+endmodule

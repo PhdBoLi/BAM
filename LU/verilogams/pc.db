@@ -1,0 +1,14 @@
+--pcdbVlog file, Rev:1.0
+
+#CELL
+* Switch_Off *
+I_s_o_1
+
+#CELL
+* LearnPulse *
+I_lp_1
+
+#CELL
+* Switch_On2 *
+I_s_o2_1
+

@@ -1,0 +1,15 @@
+//Verilog-AMS HDL for "BAM_V1", "D2A" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module D2A (D,A);
+input D;
+output A;
+
+logic D;
+electrical A;
+
+analog
+V(A) <+ transition((D == 1) ? 1 : -1,0,1n,1n);
+endmodule

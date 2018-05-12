@@ -1,0 +1,16 @@
+//Verilog-AMS HDL for "BAM_V1", "AMP_V1" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module AMP_V1 (pout, nout, pin, nin );
+output pout, nout;
+input pin, nin;
+electrical pin, nin, pout, nout;
+branch (pout, nout) out;
+branch (pin, nin) in;
+analog begin
+V(out): V(in) == 0;
+end
+endmodule
+endmodule

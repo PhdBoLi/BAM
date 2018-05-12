@@ -1,0 +1,25 @@
+//Analog simulation control file  ascf
+//simulator lang=spectre
+//saveNodes options rawfmt=sst2
+//timeDom tran stop=1u
+//Analog Kernel using -ANALOGCONTROL  ./amsControlSpectre.scs.
+//include "../../../models/tsmc13.scs"
+//include "../../../model1/"
+simulator lang=spectre 
+
+global 0
+
+simulatorOptions options temp=27 tnom=27 scale=1.0 scalem=1.0 reltol=1e-3 \
+vabstol=1e-6 iabstol=1e-12 gmin=1e-12 rforce=1 maxnotes=5 maxwarns=5 \
+digits=5 pivrel=1e-3 checklimitdest=psf 
+
+tran tran stop=3412u write="spectre.ic" writefinal="spectre.fc" \
+annotate=status maxiters=5 
+
+finalTimeOP info what=oppoint where=rawfile
+
+modelParameter info what=models where=rawfile 
+element info what=inst where=rawfile 
+outputParameter info what=output where=rawfile 
+
+wave_out options rawfmt=sst2

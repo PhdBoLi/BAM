@@ -1,0 +1,28 @@
+--pcdbVlog file, Rev:1.0
+
+#CELL
+* JK_negv1 *
+I_JK_negv1_1
+
+#CELL
+* NotGate *
+I_NotGate_1
+I_NotGate_2
+
+#CELL
+* Convert *
+I_c_1
+I_c_2
+
+#CELL
+* D2Aconnect *
+I_D2Aconnect_1
+
+#CELL
+* A2Dconnect *
+I_A2Dconnect_1
+I_A2Dconnect_5
+I_A2Dconnect_4
+I_A2Dconnect_3
+I_A2Dconnect_2
+

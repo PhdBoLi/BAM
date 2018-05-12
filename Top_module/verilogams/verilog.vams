@@ -1,0 +1,575 @@
+//Verilog-AMS HDL for "BAM_V1", "Top_Recall_Only" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+`define xNum  96
+`define yNum  96
+`define Period 2u
+module Top_Recall_Only ( );
+//wire &  net type declaration
+electrical gnd;
+ground gnd;
+
+// neuron module signal
+electrical tb_jk_clk;
+electrical tb_jk_clk_res;
+electrical tb_jk_train_clk;
+electrical tb_jk_test_clk;
+
+electrical [`xNum:1]tb_x_in;
+electrical [`xNum:1]tb_x_in_res;
+electrical [`xNum:1]tb_x_out;
+electrical [`xNum:1]tb_x_out_res;
+electrical [`xNum:1]tb_x_sum;
+
+electrical [`yNum:1]tb_y_in;
+electrical [`yNum:1]tb_y_in_res;
+electrical [`yNum:1]tb_y_out; 
+electrical [`yNum:1]tb_y_out_res; 
+electrical [`yNum:1]tb_y_sum; 
+
+//Switch Module signal
+electrical tb_phase_ch;
+electrical tb_switch_en;
+electrical tb_switch_en_res;
+electrical tb_switch_en_train;
+electrical tb_switch_en_test;
+
+electrical [`xNum:1]tb_s_x_io;
+electrical [`yNum:1]tb_s_y_io;
+
+//Weight Matrix signal
+electrical tb_s_weight_xbias;
+electrical tb_s_weight_ybias;
+
+electrical tb_amp_n_sx;
+electrical tb_amp_n_sy;
+
+electrical tb_amp_n;
+electrical tb_amp_p;
+electrical tb_amp_out;
+
+electrical tb_amp_out_sx;
+electrical tb_amp_out_sy;
+
+//Pattern Gen Module signal
+wire [`xNum:1]tb_w_xTrain_src;
+electrical [`xNum:1]tb_xTrain_src;
+electrical [`xNum:1]tb_xTrain_src_res;
+
+wire [`yNum:1]tb_w_yTrain_src;
+electrical [`yNum:1]tb_yTrain_src;
+electrical [`yNum:1]tb_yTrain_src_res;
+
+wire [`yNum:1]tb_w_yTest_src;
+electrical [`yNum:1]tb_yTest_src;
+electrical [`yNum:1]tb_yTest_src_res;
+
+electrical [`yNum:1]tb_yTest_out;
+electrical [`yNum:1]tb_yTest_out_res;
+
+electrical tb_sampling_y;
+
+
+// Arb module signal 
+electrical tb_arb_clk_src_x;
+electrical tb_arb_clk_src_y;
+electrical tb_arb_clk_res_x;
+electrical tb_arb_clk_res_y;
+//electrical tb_arb_clk;
+electrical tb_arb_clk_x;
+electrical tb_arb_clk_y;
+
+electrical [`xNum:1]tb_arb_x_sum;
+electrical [`xNum:1]tb_en_lu_x;
+
+electrical [`yNum:1]tb_arb_y_sum;
+electrical [`yNum:1]tb_en_lu_y;
+
+// LU Clk Signal
+electrical tb_lu_src_clk;
+electrical tb_lu_clk;
+electrical tb_lu_clk_res;
+
+// parameter & variable declare
+genvar i;
+
+
+// Control signal generation
+
+//phase choice clk
+vsource #(
+				 	.type			("pulse"),
+					.val0			(1),
+					.val1			(-1),
+					.period			(3412u),
+					.delay			(1n),
+					.rise			(1n),
+					.fall			(1n),
+					.width			(3408u)
+					)
+		V_phase_ch(
+					.p				(tb_phase_ch),	
+					.n				(gnd)		
+			  		);
+
+// Phase Control Switches Logic
+
+// Switch Module Signal Controled by Phase Choice 
+Switch I_switch_En_phase( 
+					.En				(tb_phase_ch),
+					.IO				(tb_switch_en_res),
+					.P1O0			(tb_switch_en_test),
+					.P0O1			(tb_switch_en_train)
+					); 
+resistor				#(.r				(1p)
+				    ) 
+		 Res_switch_En(
+					.p				(tb_switch_en_res),
+					.n				(tb_switch_en)
+					);
+
+// LU Clk Controled by Phase Choice
+Switch I_lu_En_phase(
+					.En				(tb_phase_ch),
+					.IO				(tb_lu_clk_res),
+					.P1O0			(gnd),
+					.P0O1			(tb_lu_src_clk)
+					); 
+resistor				#(.r				(1p)
+				    ) 
+		   Res_Lu_En(
+					.p				(tb_lu_clk_res),
+					.n				(tb_lu_clk)
+					);
+
+// JK Clk Controled by Phase Choice
+Switch I_jk_clk_phase(
+					.En				(tb_phase_ch),
+					.IO				(tb_jk_clk_res),
+					.P1O0			(tb_jk_test_clk),
+					.P0O1			(tb_jk_train_clk)
+					); 
+
+resistor				#(.r				(1p)
+				    ) 
+		 	  Res_Jk(
+					.p				(tb_jk_clk_res),
+					.n				(tb_jk_clk)
+					);
+
+// Arb Clk Controled by Phase Choice
+Switch I_Arb_clk_phase_x(
+					.En				(tb_phase_ch),
+					.IO				(tb_arb_clk_res_x),
+					.P1O0			(gnd),
+					.P0O1			(tb_arb_clk_src_x)
+					); 
+
+resistor				#(.r				(1p)
+				    ) 
+		 Res_Arb_x(
+					.p				(tb_arb_clk_res_x),
+					.n				(tb_arb_clk_x)
+					);
+Switch I_Arb_clk_phase_y(
+					.En				(tb_phase_ch),
+					.IO				(tb_arb_clk_res_y),
+					.P1O0			(gnd),
+					.P0O1			(tb_arb_clk_src_y)
+					); 
+
+resistor				#(.r				(1p)
+				    ) 
+		 Res_Arb_y(
+					.p				(tb_arb_clk_res_y),
+					.n				(tb_arb_clk_y)
+					);
+// Arb clk
+vsource #(
+					.type			("pulse"),
+					.val0			(0),
+					.val1			(1),
+					.period			(`Period),
+					.delay			(20n),
+					.rise			(1n),
+					.fall			(1n),
+					.width			(7n)
+		 			)
+		 V_Arb_clk_x(
+					.p				(tb_arb_clk_src_x),	
+			 	  	.n				(gnd)		
+			  		); 
+vsource #(
+					.type			("pulse"),
+					.val0			(0),
+					.val1			(1),
+					.period			(`Period),
+					.delay			(1020n),
+					.rise			(1n),
+					.fall			(1n),
+					.width			(7n)
+		 			)
+		 V_Arb_clk_y(
+					.p				(tb_arb_clk_src_y),	
+			 	  	.n				(gnd)		
+			  		); 
+
+
+
+// neuron clk
+vsource #(
+					.type			("pulse"),
+				 	.val0			(0),
+					.val1			(1),
+					.period			(1u),
+					.delay			(3n),
+					.rise			(1n),
+					.fall			(1n),
+					.width			(5n)
+					)
+	    V_JK_train_clk(
+					.p				(tb_jk_train_clk)	,
+					.n				(gnd)		
+			  		);
+vsource #(
+					.type			("pulse"),
+				 	.val0			(0),
+					.val1			(1),
+					.period			(20n),
+					.delay			(6n),
+					.rise			(1n),
+					.fall			(1n),
+					.width			(9n)
+					)
+	    V_JK_test_clk(
+					.p				(tb_jk_test_clk)	,
+					.n				(gnd)		
+			  		);
+
+
+
+// Switch Module clk
+vsource #(
+		 			.type			("pwl"),
+					.wave			("[0 0 1n 1 9n 1 10n 0 1u 0 1.001u -1 1.009u -1 1.01u 0 2u 0]"),
+		 			.delay			(15n),
+		 			.pwlperiod		(`Period)
+		 			)
+		 V_switch_en_train(
+			 		.p				(tb_switch_en_train),				
+			 		.n				(gnd)		
+			  		);
+vsource #(
+		 			.type			("pulse"),
+		 			.val0			(-1),
+		 			.val1			(1),
+		 			.period			(20n),
+					.delay			(1n),
+					.rise			(1n),
+		 			.fall			(1n),
+		 			.width			(9n)
+					)
+		 V_switch_en_test(
+			 	  	.p				(tb_switch_en_test),	
+			 	   	.n				(gnd)		
+			  		); 
+
+
+
+// Pattern Generation
+// X layer train pattern source
+GenXsrc I_train_x_src(
+					.X				(tb_w_xTrain_src[`xNum:1])
+					);
+for(i=1;i<`xNum+1;i=i+1)
+   begin:Xsrc
+		 D2Aconnect I_D2Aconnect_x(
+	              	.D				(tb_w_xTrain_src[i]),
+				 	.A				(tb_xTrain_src[i])
+					);
+        // res between pattern source and switch 
+		 resistor  #(.r				(1p)
+				    ) 
+		 	Res_x_src_pattern_switch(
+									tb_xTrain_src[i],
+									tb_xTrain_src_res[i]
+					);
+
+		//output switch
+		Switch I_x_src_phaseEn(
+					.En				(tb_phase_ch),
+					.IO				(tb_x_in_res[i]),
+					.P1O0			(gnd),
+					.P0O1			(tb_xTrain_src_res[i])
+					); 	
+
+        //res between pattern switch and neuron 
+		resistor	  #(.r				(1p)
+				    ) 
+		 	Res_neuron_x_pattern_switch(
+									tb_x_in_res[i],
+									tb_x_in[i]
+					);
+   end
+
+
+GenYsrc I_train_y_src(
+					.Y				(tb_w_yTrain_src[`yNum:1])
+					);
+GenYsrc I_test_y_src(
+					.Y				(tb_w_yTest_src[`yNum:1])
+					);
+for(i=1;i<`yNum+1;i=i+1)
+   begin:Ysrc
+		 // digital signal to analog signal
+		 D2Aconnect I_D2A_train_y(
+	              	.D				(tb_w_yTrain_src[i]),
+				 	.A				(tb_yTrain_src[i])
+					);
+		 D2Aconnect I_D2A_test_y(
+	              	.D				(tb_w_yTest_src[i]),
+				 	.A				(tb_yTest_src[i])
+					);
+         // Y train pattern source res
+		 resistor  #(.r				(1p)
+				    ) 
+		 	Res_y_train_src_pattern_switch(
+									tb_yTrain_src[i],
+									tb_yTrain_src_res[i]
+					);
+ 		// Y pattern test source res
+		 resistor  #(.r				(1p)
+				    ) 
+		 	Res_y_test_src_pattern_switch(
+									tb_yTrain_src[i],
+									tb_yTrain_src_res[i]
+					);
+
+      
+	 	 // Train and test pattern source switches
+		 Switch I_y_src_phaseEn(
+					.En				(tb_phase_ch),
+					.IO				(tb_y_in_res[i]),
+					.P1O0			(tb_yTest_out_res[i]),
+					.P0O1			(tb_yTrain_src_res[i])
+					);
+		 //
+		 Switch I_y_test_sampling(
+					.En				(tb_sampling_y),
+					.IO				(tb_yTest_out[i]),
+					.P1O0			(tb_yTest_src_res[i]),
+					.P0O1			(gnd)
+					);
+				
+         // res between test pattern switch and train pattern switch
+		 resistor  #(.r				(1p)
+				    ) 
+		 	Res_y_between_train_testoutpattern_switch(
+									tb_yTest_out[i],
+									tb_yTest_out_res[i]
+					);
+ 		//res between pattern switch and neuron
+		 resistor  #(.r				(1p)
+				    ) 
+		 	Res_y_src_pattern_switch(
+									tb_y_in_res[i],
+									tb_y_in[i]
+					);
+   end
+
+// Y test sampling source
+vsource #(
+		 			.type			("pulse"),
+		 			.val0			(-1),
+		 			.val1			(1),
+		 			.period			(0.2u),
+					.delay			(10n),
+		 			.rise			(1n),
+		 			.fall			(1n),
+		 			.width			(9n)
+		 )
+		 V_sampling_y(
+			 	 	.p				(tb_sampling_y),
+				 	.n				(gnd)		
+					);
+
+
+
+
+//LU clk
+vsource #(
+					.type			("pwl"),
+		 			.wave			("[0 0 20n 0 21n 1 0.95u 1 0.951u 0 1.02u 0 1.021u -1 1.95u -1 1.951u 0 2u 0]"),
+		 			.delay			(15n),
+					.pwlperiod		(`Period)
+		 			)
+		 V_Lu_clk(
+			 		.p				(tb_lu_src_clk),				
+			 		.n				(gnd)		
+			  	 	);
+
+
+
+
+// X Layer Neuron,Switch,Arb module
+for(i=1;i<`xNum+1;i=i+1) 
+    begin:X
+		// X Layer Neuron
+	    Xneuron xcell(
+			   		.Sum				(tb_x_sum[i]),
+					.Xin				(tb_x_in[i]),
+					.Xout			(tb_x_out_res[i]),
+					.Nclk			(tb_jk_clk)
+					);
+        // X layer Neuron out res
+	   resistor  #(.r				(1p)
+				    ) 
+		 	Res_xneuron_out(
+									tb_x_out_res[i],
+									tb_x_out[i]
+					);
+
+		// X Layer Switch	
+		Switch_X s_x(
+					.IO				(tb_s_x_io[i]),
+					.EnDir			(tb_switch_en),
+					.EnMode			(tb_phase_ch),
+					.N1				(tb_x_sum[i]),
+					.N2				(tb_arb_x_sum[i]),
+					.N3				(gnd),
+					.N4				(tb_x_out[i])
+					);
+		// X Layer Negative Weight bias
+		resistor   #(.r				(8k)
+					) 
+			  Res_X (
+					tb_s_x_io[i],
+					tb_s_weight_xbias
+					);
+		// X Layer Arb
+		Arb	   arb_x(
+					.ArbClk			(tb_arb_clk_x),
+					.InSum			(tb_arb_x_sum[i]),
+					.InM				(tb_x_out[i]),
+					.OutEn			(tb_en_lu_x[i])		
+					);
+	end
+
+// Y Layer Neuron,Switch,Arb module
+for(i=1;i<`yNum+1;i=i+1) 
+    begin:Y
+		// Y Layer Neuron
+	    Yneuron ycell(
+				   	.Sum				(tb_y_sum[i]),
+					.Yin				(tb_y_in[i]),
+					.Yout			(tb_y_out_res[i]),
+					.Nclk			(tb_jk_clk)
+					);
+        // Y layer Neuron out res
+	   resistor  #(.r				(1p)
+				    ) 
+		 	Res_yneuron_out(
+					tb_y_out_res[i],
+					tb_y_out[i]
+					);
+
+		// Y Layer Switch 
+		Switch_Y  s_y(
+					.IO				(tb_s_y_io[i]),
+					.EnDir			(tb_switch_en),
+					.EnMode			(tb_phase_ch),
+					.N1				(tb_y_sum[i]),
+					.N2				(tb_arb_y_sum[i]),
+					.N3				(tb_y_out[i])
+		//			.N4				(gnd)
+					);
+		// Y Layer Negative Weight Bias
+		resistor   #(.r				(8k)
+				    ) 
+			   Res_Y(
+					tb_s_y_io[i],
+					tb_s_weight_ybias
+					);
+		// Y Layer Arb
+		Arb 	   arb_y(
+					.ArbClk			(tb_arb_clk_y),
+					.InSum			(tb_arb_y_sum[i]),
+					.InM				(tb_y_out[i]),
+					.OutEn			(tb_en_lu_y[i])		
+					);
+	end
+
+
+// weight array matrix 
+// Positive weight array
+for(i=1;i<`xNum+1;i=i+1) 
+    begin:Row
+	  	 Weight_Row r(
+					.Col_Vec			(tb_s_y_io[`yNum:1]),		
+					.Row				(tb_s_x_io[i]),
+		   			.Enx				(tb_en_lu_x[i]),
+		   			.Eny				(tb_en_lu_y[`yNum:1]),
+		   			.X				(tb_x_out[i]),
+		   			.Y				(tb_y_out[`yNum:1]),
+		   			.Lu_clk			(tb_lu_clk)
+ 		  			); 
+    end 
+
+// Negative weight bias
+
+AMP_V1 I_a1 	(
+					.pin				(gnd),
+					.nin				(tb_amp_n),
+					.pout			(tb_amp_out),
+					.nout			(gnd)
+		);
+
+Switch I_s_amp_y( 
+					.En				(tb_switch_en),
+					.IO				(tb_s_weight_ybias),
+					.P1O0			(tb_amp_n_sy),
+					.P0O1			(tb_amp_out_sy)
+				);
+Switch I_s_amp_x( 
+					.En				(tb_switch_en),
+					.IO				(tb_s_weight_xbias),
+					.P1O0			(tb_amp_out_sx),
+					.P0O1			(tb_amp_n_sx)
+				);
+resistor		#(		.r				(8k)
+				    ) 
+		 Res_Amp_FB(
+					.p				(tb_amp_n),
+					.n				(tb_amp_out)
+					);
+
+resistor		#(		.r				(1p)
+				    ) 
+		 Res_Amp_sx(
+					.p				(tb_amp_out),
+					.n				(tb_amp_out_sx)
+					);
+
+resistor		#(		.r				(1p)
+				    ) 
+		 Res_Amp_sy(
+					.p				(tb_amp_out),
+					.n				(tb_amp_out_sy)
+					);
+
+resistor		#(		.r				(1p)
+				    ) 
+		 Res_Amp_sx_in(
+					.p				(tb_amp_n_sx),
+					.n				(tb_amp_n)
+					);
+
+resistor		#(		.r				(1p)
+				    ) 
+		 Res_Amp_sy_in(
+					.p				(tb_amp_n_sy),
+					.n				(tb_amp_n)
+					);
+
+endmodule

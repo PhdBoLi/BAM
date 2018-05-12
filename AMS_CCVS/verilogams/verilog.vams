@@ -1,0 +1,16 @@
+//Verilog-AMS HDL for "BAM_V1", "AMS_CCVS" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module AMS_CCVS (PS,NS,P,N);
+inout PS,NS,P,N;
+electrical PS,NS,P,N;
+parameter real gain=1;
+parameter real ron=1p from [0:inf);
+analog begin
+V(PS,NS)<+ron*I(PS,NS);
+V(P,N)<+ gain* I(PS,NS);
+
+end
+endmodule

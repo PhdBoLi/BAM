@@ -1,0 +1,33 @@
+//Verilog-AMS HDL for "BAM_V1", "LU" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module LU (Lclk,X,Y,Enx,Eny,Outp,Outn,IO_S);
+input Lclk,X,Y,Enx,Eny;
+inout Outp,Outn,IO_S;
+electrical Lclk,X,Y,Enx,Eny,Outp,Outn,gnd,IO_S,lp_out; 
+ground gnd;
+LearnPulse I_lp_1(
+					    .Clk			(Lclk),
+					    .X			(X),
+					    .Y			(Y),
+						.Enx			(Enx),
+						.Eny			(Eny),
+						.LearnPulse	(lp_out)
+						);
+
+Switch_Off I_s_o_1(	
+						.En			(lp_out),
+						.IO_XY		(IO_S),
+						.IO_P		(Outp)
+						);							
+			
+Switch_On2 I_s_o2_1(	
+						.En			(lp_out),
+						.In_p		(lp_out),
+						.In_gnd		(gnd),
+						.Outp		(Outp),
+						.Outn		(Outn)
+						);
+endmodule

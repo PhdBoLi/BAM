@@ -1,0 +1,53 @@
+//Verilog-AMS HDL for "BAM_V1", "Arb" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Arb (ArbClk,InSum,InM,OutEn );
+input ArbClk,InSum,InM;
+output OutEn;
+electrical ArbClk,InSum,InM,OutEn,set,reset,ew_io;
+electrical inSum,gnd;
+ground gnd;
+wire w_ArbClk,w_r,w_s,q,qn;
+AMS_VCVS I_vcvs(
+				.PS			(InSum),
+				.NS			(gnd),
+				.P			(inSum),
+				.N			(gnd)
+				);
+Evalue I_evalue_1(
+				.ps			(inSum),
+				.pt			(InM),
+				.out			(ew_io)
+				);
+Convert I_convert(
+//				.In			(ew_io),
+//				.P1N0		(set),
+//				.P0N1		(reset)
+				);
+A2Dconnect I_A2Dconnect_1(
+					    .A			(ArbClk),
+					    .D			(w_ArbClk)
+					    );
+A2Dconnect I_A2Dconnect_2(
+					    .A			(reset),
+					    .D			(w_r)
+					    );	
+A2Dconnect I_A2Dconnect_3(
+					    .A			(set),
+					    .D			(w_s)
+					    );
+SR I_sr_1(
+ 		 .q			(q),
+		 .qn			(qn),
+		 .s			(w_s),
+		 .r			(w_r),
+		 .clk		(w_ArbClk)
+		 );
+D2Aconnect I_D2Aconnect_1(
+	              .D			(q),
+				 .A			(OutEn)
+				 );
+
+endmodule

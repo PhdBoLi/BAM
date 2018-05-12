@@ -1,0 +1,92 @@
+//Verilog-AMS HDL for "BAM_V1", "GenYsrc" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+`define  YBITs  96
+`define  TrainSet   3 
+`define  LoopNum   568
+`define TestLoop  1
+
+module GenYsrc (Y);
+output [`YBITs:1]Y;
+reg [`YBITs:1]Y;
+reg [`YBITs:1] mem  [`TrainSet-1:0];
+reg [`YBITs:1] nen  [`TrainSet-1:0];
+integer i,j;
+// reg   [7:0]  mem[256:1]  a 8-bit, 256-word  mem  
+//initial $readmemh ( "E:/readhex/mem.dat", mem ) // .dat  mem   
+ initial begin
+// $readmemb ( "/home/ic/Project/re_target.txt", mem); // .dat  mem  
+ 
+ $readmemb ( "/home/ic/Project/trainPatternY96.txt", mem);
+for(j=0;j<`LoopNum;j=j+1)
+	begin
+    for(i=0; i<`TrainSet; i=i+1)
+	    begin
+        Y = mem[i];
+		#2000  ;
+    end
+ end
+/*
+ for(j=0;j<1000;j=j+1) 
+	begin
+    for(i=0; i<`TrainSet; i=i+1) 	
+		begin
+		#10000;  
+    		end
+ 	end
+*/
+
+$readmemb ( "/home/ic/Project/target_noise_7.txt",nen); // .dat  mem
+ for(j=0;j<`TestLoop;j=j+1) 
+	begin
+ 	for(i=0; i<6; i=i+1) 
+		begin
+     	Y = nen[i];
+	 	#200;    
+  		end
+ 	end
+
+ $readmemb ( "/home/ic/Project/target_noise_5.txt",nen); // .dat  mem
+ for(j=0;j<`TestLoop;j=j+1)
+	 begin
+ 	 for(i=0; i<6; i=i+1) 
+		begin
+     	Y = nen[i];
+	 	#200;   
+  		end
+	 end
+
+
+
+$readmemb ( "/home/ic/Project/target_noise_3.txt",nen); // .dat  mem
+ for(j=0;j<6;j=j+1)
+	begin
+  	for(i=0; i<6; i=i+1)
+		begin
+     	Y = nen[i];
+		#200; 
+  		end
+ 	end
+
+
+ for(j=0;j<`TestLoop;j=j+1)
+	begin
+    for(i=0; i<`TrainSet; i=i+1)
+	    begin
+        Y = mem[i];
+		#200  ;
+    		end
+ 	end
+
+ for(j=0;j<1000;j=j+1)
+	begin
+  	for(i=0; i<`TrainSet; i=i+1)
+		begin 
+	 	#200;   
+  		end
+ 	end
+
+ #100 $finish;
+ end
+endmodule

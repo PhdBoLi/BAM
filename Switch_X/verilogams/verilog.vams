@@ -1,0 +1,34 @@
+//Verilog-AMS HDL for "BAM_V1", "Switch_X" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Switch_X (IO,EnDir,EnMode,N1,N2,N3,N4);
+inout IO;
+input EnDir,EnMode;
+inout N3,N4;
+output N1,N2;
+electrical IO,EnDir,EnMode,N1,N2,N3,N4;  
+electrical io_mode,cvt;
+electrical gnd;
+ground gnd;
+
+Switch I_dir_choice(
+				   .En			(EnDir),
+				   .IO			(IO),
+				   .P1O0			(cvt),
+				   .P0O1			(N4)
+				   );
+AMS_CCVS I_ccvs(
+			   .PS			(cvt),
+			   .NS			(gnd),
+			   .P			(io_mode),
+			   .N			(gnd) 
+			  );
+Switch I_mode_choice(
+				   .En			(EnMode),
+				   .IO			(io_mode),
+				   .P1O0			(N1),
+				   .P0O1			(N2)
+				   );
+endmodule

@@ -1,0 +1,65 @@
+//Verilog-AMS HDL for "BAM_V1", "Xneuron" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Xneuron (Sum,Xin,Xout,Nclk);
+input Nclk,Xin,Sum;
+output Xout;
+electrical Nclk,Xin,Sum,Xout;
+electrical j,k,ew_set,ew_reset;
+wire w_clk,w_J,w_K,w_reset,w_r,w_set,w_s,w_q,w_qn;
+Convert I_c_1(
+			.In			(Sum),
+			.P1N0		(j),
+			.P0N1		(k)
+			);
+Convert I_c_2(
+			.In			(Xin),
+			.P1N0		(ew_set),
+			.P0N1		(ew_reset)
+			);
+
+
+A2Dconnect I_A2Dconnect_1(
+					    .A			(Nclk),
+					    .D			(w_clk)
+					    );
+A2Dconnect I_A2Dconnect_2(
+					    .A			(j),
+					    .D			(w_j)
+					    );	
+A2Dconnect I_A2Dconnect_3(
+					    .A			(k),
+					    .D			(w_k)
+					    );
+A2Dconnect I_A2Dconnect_4(
+					    .A			(ew_set),
+					    .D			(w_set)
+					    );
+A2Dconnect I_A2Dconnect_5(
+					    .A			(ew_reset),
+					    .D			(w_reset)
+					    );	
+NotGate I_NotGate_1(
+				   .in			(w_reset),
+				   .out			(w_r)
+				  );
+NotGate I_NotGate_2(
+				   .in			(w_set),
+				   .out			(w_s)
+				  );
+JKv1 I_jkv1_1(
+					.cp			(w_clk),	
+					.j			(w_J),
+					.k			(w_K),
+					.r			(w_r),
+					.s			(w_s),
+					.q			(w_q),
+					.qn			(w_qn)
+					);
+D2A I_d2a_1(
+		    .D		(w_q),
+	 		.A		(Xout)
+			);
+endmodule

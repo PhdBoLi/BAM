@@ -1,0 +1,8 @@
+//Verilog-AMS HDL for "BAM_V1", "D2A" "verilogams"
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module D2A ( );
+
+endmodule

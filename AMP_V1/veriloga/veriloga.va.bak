@@ -1,0 +1,17 @@
+// VerilogA for BAM_V1, AMP_V1, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module AMP_V1(nout, pout, nin, pin);
+output nout;
+electrical nout;
+output pout;
+electrical pout;
+input nin;
+electrical nin;
+input pin;
+electrical pin;
+
+
+endmodule
