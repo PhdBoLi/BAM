@@ -1,13 +1,19 @@
 # memristor based BAM Neural Network Implemented by Verilog-AMS 
-
+-----------------------------------------------
 ## Overview
-;project purpose 
+-----------------------------------------------
+//;project purpose 
 This Project   
-;brief illustration of Verilog-AMS
+<!--;brief illustration of Verilog-AMS-->
+
+
 ## Dependency
+=================================================
 Cadence Virtuoso Platform must be installed, the version is asked for IC617 or higher,coupled with the AMS designer installed. the detailed product ID for run Verilog-AMS is INCISIVE151 MMSIM151
 
+
 ## Sample Code Illustration of Verilog-AMS
+=================================================
 ### Voltage Source 
 
 
