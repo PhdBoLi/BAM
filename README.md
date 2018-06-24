@@ -35,6 +35,7 @@ For detailed information, please refer to the Virtuoso Spectre Circuit Simulator
 The control file in this project is entitled amsControlSpectre.scs 
 <!--case illustration -->
 Here we just extract a simple case of doing the tran analysis in the control file which set up the tran simulation for a time of 3412 us 
+
 ![avatar](./Image/tran_setup.jpg)
 
 ### Run the simulation script
