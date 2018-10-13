@@ -1,0 +1,16 @@
+#
+# Edit Lock-Stake file. CAUTION: Please do not change.
+#
+# Information about current Edit Lock Owner.
+#
+LockStakeVersion               1.1
+LoginName                      root
+HostName                       ubuntu
+ProcessIdentifier              2442
+ProcessCreationTime_UTC        1539083670
+ProcessCreationTime_Readable   Tue Oct  9 04:14:30 2018 PDT
+AppIdentifier                  OA File System Design Manager
+OSType                         unix
+ReasonForPlacingEditLock       OpenAccess edit lock
+FilePathUsedToEditLock         /home/ic/Project/BAM_V1/TB_Top3x3/schematic/sch.oa.cdslck
+TimeEditLocked                 Thu Oct 11 06:50:25 2018 PDT

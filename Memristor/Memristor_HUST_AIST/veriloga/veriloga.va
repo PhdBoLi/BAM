@@ -1,0 +1,131 @@
+// VerilogA for Memristor, Memristor_HUST_AIST, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module Memristor_HUST_AIST(p,n,Vw,Vm);
+inout p,n;
+output Vw,Vm;
+electrical Vw,Vm;
+electrical p,n;
+
+parameter real w_init=3n;
+parameter real D=3n from (0:10n);
+parameter real Uv=1.6e-12 from (0:1e-8);
+parameter real p_coeff=10 from (0:100);
+
+parameter real Vt_plus=0.37;
+parameter real Vt_minus=-0.19;
+
+parameter real R_on=10;
+parameter real R_off=420;
+
+parameter real i_o=1e-3;
+parameter real i_on=1;
+parameter real i_off=1e-5;
+    // local variables that should persist over time steps
+    real w_last;
+    real time_last;
+ 
+    // local variables that hold temporary values
+    real M;
+    real G;
+    real window_function;
+    real w;
+    real dw;
+    real R;
+ //   real direction;
+    real i_last; 
+    real t;
+    real time_delta;
+    real Ibias;
+ //////////////////////////////////
+ analog function real stp;
+ input i; 
+ real i;
+ begin
+ stp=(i >= 0) ? 1:0;
+ end 
+ endfunction
+
+ //////////////////////////////////
+   
+   analog begin 
+        @(initial_step)
+        begin
+         // w_last = ((Roff - Rinit) / (Roff - Ron)) * D;
+        //  w_last=5n;
+		time_last = 0;
+		w_last=w_init;
+		i_last=0;
+		dw=0;
+          
+        end      
+   
+ 		if (V(p,n)<Vt_minus) begin
+				t=$abstime;				
+                 time_delta = t - time_last;
+                 i_last = V(p,n)/(R_on * w_last / D + R_off * (1 - w_last / D));
+                 window_function = 1-pow((w_last/D)-stp(-1*i_last),(2*p_coeff));
+                 // window_function = 1-pow((w_last/D)-stp(i_last),(2*p_coeff));
+				dw = Uv*R_on/D*i_last/i_on*time_delta *window_function;
+                 //dw = -1*Uv*R_on/D*i_last/i_on*time_delta *window_function;
+				w = w_last+dw;
+
+				if(w > D) begin w = D; end
+                 if(w < 0) begin w = 0; end
+ 
+                M = (R_on * w / D + R_off * (1 - w / D));
+				V(p,n) <+ M*I(p,n);
+
+                 w_last = w;
+                 time_last = t;
+			//	current_last=I(p,n);
+                 end
+
+ 		else if (V(p,n)>Vt_plus) begin
+				t=$abstime;				
+                 time_delta = t - time_last;
+				i_last = V(p,n)/(R_on * w_last / D + R_off * (1 - w_last / D));
+				window_function = 1-pow(w_last/D-stp(-1*i_last),(2*p_coeff));
+  
+                 if (i_last-i_o>0) begin Ibias = i_last-i_o;end
+                 else begin Ibias = i_o-i_last; end 
+	             //dw = Uv*R_on/D*i_off/(i_last-i_o)*time_delta *window_function;
+                 dw = Uv*R_on/D*i_off/Ibias*time_delta *window_function;
+				//dw = Uv*R_on/D*i_off/Ibias*time_delta;
+				w=w_last+dw;
+				if(w > D) begin w = D; end
+                 if(w < 0) begin w = 0; end
+
+				M = (R_on * w / D + R_off * (1 - w / D));
+				V(p,n) <+ M*I(p,n);
+
+                 w_last = w;
+                 time_last = t;
+			//	current_last=I(p,n);
+				end
+		else begin
+				t=$abstime;				
+                 time_delta = t - time_last;
+             	i_last = V(p,n)/(R_on* w_last / D + R_off * (1 - w_last / D));
+				window_function = 1-pow(w_last/D-stp(-1*i_last),(2*p_coeff));
+                 dw = 0;
+				w = w_last+dw;
+				M = (R_on * w / D + R_off * (1 - w / D));
+				V(p,n)<+ M*I(p,n);
+                 w_last = w;
+                 time_last = t;
+			//	current_last=I(p,n);
+				end
+
+// inside variable output 
+
+         V(Vw) <+ w;
+
+         V(Vm) <+ M;
+
+     end
+
+
+endmodule
