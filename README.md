@@ -23,7 +23,7 @@ For beginers to better understand the Cadence product, let's draw such an analog
 ## Geting Start
 -----------------------------------------------
 ### Directory structure of the Verilog-AMS source file
-The Verilog-AMS code of each circuit module is in folder with coresponding name, and the folder named "top\_module" is top test bench module that contain both stimuli and the full design of the memristive BAM circuits.
+The Verilog-AMS code of each circuit module is in folder with coresponding name. The folder named "top\_module" is top test bench module that contain both stimuli and the full design of the linear ion drift model based 24x24 memristive BAM circuits, and the folder named "TB\_Top3x3" is the threshold model based 6x6 memristive BAM circuits top module.
 
 ### Set up spectre control file
 <!--usage -->
